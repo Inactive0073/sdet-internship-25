@@ -1,0 +1,23 @@
+# virtual environments
+.venv/
+venv/
+.env
+
+# cache
+__pycache__/
+.pytest_cache
+.ruff_cache
+
+# allure
+allure-results/
+allure-report/
+
+
+# all
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.log
+*.pot
+*.py[cod]
