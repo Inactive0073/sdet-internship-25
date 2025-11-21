@@ -1,7 +1,7 @@
 import allure
 import pytest
 
-from src.api.actions.post_aciton import EntityActions
+from src.api.actions.post_aciton import PostActions
 from src.api.models.post_in import EntityRequest
 from src.api.models.post_out import EntityResponse
 
@@ -27,10 +27,10 @@ from src.api.models.post_out import EntityResponse
 @pytest.mark.api
 class TestPatchEntity:
     @allure.title("TC-004: Частичное обновление сущности")
-    def test_patch_entity(self, entity: EntityResponse, entity_actions: EntityActions):
+    def test_patch_entity(self, post: EntityResponse, post_actions: PostActions):
         updated_request = EntityRequest.random()
-        response = entity_actions.patch_entity(entity.id, updated_request)
+        response = post_actions.patch_entity(post.id, updated_request)
 
         assert 200 <= int(response.status_code) <= 204, f"Статус код не соответствует ожидаемому. Текущий статус код: {response.status_code}" 
-        updated = entity_actions.get_entity_by_id(entity.id)
+        updated = post_actions.get_entity_by_id(post.id)
         assert updated.title == updated_request.title

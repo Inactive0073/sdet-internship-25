@@ -3,8 +3,8 @@ import json
 import allure
 import pytest
 
-from src.api.actions.post_aciton import EntityActions
-from src.api.models.post_out import EntityResponse
+from src.api.actions.post_aciton import PostActions
+from src.api.models.post_out import PostResponse
 from src.data.endpoints import Endpoints
 
 
@@ -28,10 +28,10 @@ from src.data.endpoints import Endpoints
 @pytest.mark.api
 class TestDeleteEntity:
     @allure.title("TC-005: Удаление сущности по ID")
-    def test_delete_entity(self, entity: EntityResponse, entity_actions: EntityActions):
+    def test_delete_post(self, post: PostResponse, post_actions: PostActions):
         # --- Первичное удаление ---
         with allure.step("Удаляем созданную сущность"):
-            delete_response = entity_actions.delete_entity(entity.id)
+            delete_response = post_actions.delete_post(post.id)
             allure.attach(
                 json.dumps(dict(delete_response.headers), indent=2),
                 name="delete_response_headers",
@@ -43,8 +43,8 @@ class TestDeleteEntity:
 
         # --- GET после удаления ---
         with allure.step("Проверяем, что объект действительно удалён"):
-            get_after_delete = entity_actions.client.get(
-                Endpoints.GET_BY_ID.format(id=entity.id)
+            get_after_delete = post_actions.client.get(
+                Endpoints.GET_BY_ID.format(id=post.id)
             )
             allure.attach(
                 str(get_after_delete.text or get_after_delete.status_code),
@@ -68,7 +68,7 @@ class TestDeleteEntity:
 
         # --- Повторное удаление ---
         with allure.step("Повторное удаление той же сущности"):
-            second_delete = entity_actions.delete_entity(entity.id)
+            second_delete = post_actions.delete_post(post.id)
             allure.attach(
                 json.dumps(dict(second_delete.headers), indent=2),
                 name="second_delete_response_headers",
