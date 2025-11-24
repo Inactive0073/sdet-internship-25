@@ -4,7 +4,7 @@ import allure
 import pytest
 
 from src.api.actions.post_aciton import PostActions
-from src.api.models.post_out import PostResponse
+from src.api.models.post import PostCreationResponse
 
 
 @allure.parent_suite("API WordPress")
@@ -26,7 +26,7 @@ class TestDeleteEntity:
     - HTTP 200 или 204
     - Повторный GET по `id` возвращает 404
     """)
-    def test_delete_post(self, post: PostResponse, post_actions: PostActions):
+    def test_delete_post(self, post: PostCreationResponse, post_actions: PostActions):
         # --- Первичное удаление ---
         with allure.step("Удаляем созданную сущность"):
             delete_response = post_actions.delete_post(post.id)

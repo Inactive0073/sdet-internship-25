@@ -2,8 +2,7 @@ import allure
 import pytest
 
 from src.api.actions.post_aciton import PostActions
-from src.api.models.post_in import PostRequest
-from src.api.models.post_out import PostResponse
+from src.api.models.post import PostCreationRequest, PostCreationResponse
 
 
 @allure.parent_suite("API WordPress")
@@ -28,8 +27,8 @@ class TestPatchEntity:
     """)
     @allure.title("TC-P5. Частичное обновление сущности через PATCH")
     @pytest.mark.positive
-    def test_patch_entity(self, post: PostResponse, post_actions: PostActions):
-        updated_request = PostRequest.random()
+    def test_patch_entity(self, post: PostCreationResponse, post_actions: PostActions):
+        updated_request = PostCreationRequest.random()
         response = post_actions.patch_post(post.id, updated_request)
 
         assert 200 <= int(response.status_code) <= 204, (
@@ -52,9 +51,9 @@ class TestPatchEntity:
     @allure.title("TC-P6. Редактирование поста с некорректным типом данных")
     @pytest.mark.negative
     def test_patch_entity_with_invalid_data(
-        self, post: PostResponse, post_actions: PostActions
+        self, post: PostCreationResponse, post_actions: PostActions
     ):
-        invalid_request = PostRequest.random(
+        invalid_request = PostCreationRequest.random(
             status="123"
         )  # Некорректный тип данных для поля status
 

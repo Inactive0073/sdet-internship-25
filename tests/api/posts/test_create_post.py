@@ -4,7 +4,8 @@ import allure
 import pytest
 
 from src.api.actions import PostActions
-from src.api.models import PostRequest, PostResponse
+from src.api.models import PostCreationRequest
+from src.api.models.post import PostCreationResponse
 
 
 @allure.parent_suite("API WordPress")
@@ -30,10 +31,10 @@ class TestCreatePost:
     """)
     @pytest.mark.positive
     def test_create_post(self, post_actions: PostActions):
-        request_data = PostRequest.random()
+        request_data = PostCreationRequest.random()
 
         created = post_actions.create_post(request_data)
-        assert isinstance(created, PostResponse), (
+        assert isinstance(created, PostCreationResponse), (
             "Ответ не соответствует модели PostResponse"
         )
         assert created.id > 0, "ID должен быть положительным числом"
@@ -57,7 +58,7 @@ class TestCreatePost:
     """)
     @pytest.mark.negative
     def test_create_post_with_empty_fields(self, post_actions: PostActions):
-        request_data = PostRequest.random(empty=True)
+        request_data = PostCreationRequest.random(empty=True)
 
         with allure.step("Пытаемся создать пост с пустым title, content"):
             created = post_actions.create_post_with_empty_fields(request_data)

@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from src.api.actions import PostActions
-from src.api.models import PostResponse
+from src.api.models.post import PostCreationResponse
 
 
 @allure.parent_suite("API WordPress")
@@ -23,10 +23,10 @@ class TestGetEntityById:
     
     <b>Ожидаемый результат:</b>
         - HTTP 200""")
-    def test_post_by_id(self, post: PostResponse, post_actions: PostActions):
+    def test_post_by_id(self, post: PostCreationResponse, post_actions: PostActions):
         fetched = post_actions.get_post_by_id(post.id)
 
-        assert isinstance(fetched, PostResponse), (
+        assert isinstance(fetched, PostCreationResponse), (
             "Ответ не соответствует модели EntityResponse"
         )
         assert fetched.id == post.id, (
