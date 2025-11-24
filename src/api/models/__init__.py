@@ -1,4 +1,10 @@
-from .post_in import PostRequest
-from .post_out import PostResponse
+from .post import PostCreationRequest, PostCreationResponse
+from .user import UserCreationRequest, UserCreationResponse, UserPublicResponse
 
-__all__ = ["PostRequest", "PostResponse"]
+__all__ = [
+    "PostCreationRequest",
+    "PostCreationResponse",
+    "UserCreationRequest",
+    "UserCreationResponse",
+    "UserPublicResponse",
+]

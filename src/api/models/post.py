@@ -1,12 +1,26 @@
+from datetime import datetime
 from typing import Any
 
 from faker import Faker
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from .base import BaseAPIModel as Base
 
 fake = Faker("en_US")
 
 
-class PostRequest(BaseModel):
+class Title(Base):
+    raw: str | None = None
+    rendered: str
+
+
+class Content(Base):
+    raw: str | None = None
+    rendered: str
+    protected: bool
+
+
+class PostCreationRequest(Base):
     title: str = Field(..., description="Заголовок статьи")
     content: str = Field(..., description="Содержимое статьи")
     status: str = Field(..., description="Статус статьи")
@@ -14,7 +28,7 @@ class PostRequest(BaseModel):
     @classmethod
     def random(
         cls, empty: bool = False, status: str | Any = "publish"
-    ) -> "PostRequest":
+    ) -> "PostCreationRequest":
         if empty:
             return cls(title="", content="", status=status)
         return cls(
@@ -23,7 +37,12 @@ class PostRequest(BaseModel):
             status=status,
         )
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True,
-    )
+
+class PostCreationResponse(Base):
+    id: int
+    slug: str
+    status: str
+    date: datetime
+    modified: datetime
+    title: Title
+    content: Content
