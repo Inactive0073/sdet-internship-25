@@ -4,6 +4,7 @@ import pytest
 from src.api.actions import UserActions
 from src.api.models import UserCreationRequest
 from src.api.models.user import UserCreationResponse
+from src.services.db.dao import UserDAO
 
 
 @allure.parent_suite("API WordPress")
@@ -28,7 +29,7 @@ class TestCreatePost:
     - Поля совпадают с данными запроса
     """)
     @pytest.mark.positive
-    def test_create_post(self, user_actions: UserActions):
+    def test_create_user(self, user_dao: UserDAO, user_actions: UserActions):
         request_data = UserCreationRequest.random()
 
         created = user_actions.create_user(request_data)
@@ -40,3 +41,7 @@ class TestCreatePost:
             "Username не совпадает с исходными данными"
         )
         assert created.email == request_data.email, "Email должен совпадать"
+
+        assert user_dao.email_exists(created.email), (
+            "Пользователь не найден в БД после создания"
+        )
