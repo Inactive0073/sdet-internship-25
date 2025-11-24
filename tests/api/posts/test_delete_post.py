@@ -5,29 +5,27 @@ import pytest
 
 from src.api.actions.post_aciton import PostActions
 from src.api.models.post_out import PostResponse
-from src.data.endpoints import Endpoints
 
 
-@allure.parent_suite("API test-service")
-@allure.suite("Entity Management")
-@allure.sub_suite("DELETE /api/delete")
-@allure.epic("API test-service")
-@allure.feature("Entity")
-@allure.story("Удаление сущности по ID")
-@allure.severity(allure.severity_level.CRITICAL)
-@allure.tag("api", "positive", "delete", "v1.0")
+@allure.parent_suite("API WordPress")
+@allure.suite("Post Management")
+@allure.sub_suite("DELETE /wp-json/wp/v2/posts")
+@allure.epic("API WordPress")
+@allure.feature("Post Deletion")
 @allure.label("owner", "Alexey Yumanov")
-@allure.testcase("TC-005")
-@allure.description("""
-**Цель:** Проверить успешное удаление сущности по `id`.
-
-**Ожидаемый результат:**
-- HTTP 200 или 204
-- Повторный GET по `id` возвращает 404
-""")
 @pytest.mark.api
 class TestDeleteEntity:
-    @allure.title("TC-005: Удаление сущности по ID")
+    @allure.story("Удаление сущности по ID")
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.tag("api", "positive", "delete", "v1.0")
+    @allure.testcase("TC-P7. Удаление поста")
+    @allure.description_html("""
+    <b>Цель:</b> Проверить успешное удаление сущности по `id`.
+
+    <b>Ожидаемый результат:</b>
+    - HTTP 200 или 204
+    - Повторный GET по `id` возвращает 404
+    """)
     def test_delete_post(self, post: PostResponse, post_actions: PostActions):
         # --- Первичное удаление ---
         with allure.step("Удаляем созданную сущность"):
@@ -37,50 +35,47 @@ class TestDeleteEntity:
                 name="delete_response_headers",
                 attachment_type=allure.attachment_type.JSON,
             )
-            assert delete_response.status_code == 204, (
+            assert delete_response.status_code == 200, (
                 f"Удаление не подтверждено, статус: {delete_response.status_code}"
             )
 
-        # --- GET после удаления ---
-        with allure.step("Проверяем, что объект действительно удалён"):
-            get_after_delete = post_actions.client.get(
-                Endpoints.GET_BY_ID.format(id=post.id)
-            )
+        # --- Проверка удаления ---
+        with allure.step("Проверяем, что сущность удалена"):
+            get_response = post_actions.get_post_by_id_no_raise(post.id)
             allure.attach(
-                str(get_after_delete.text or get_after_delete.status_code),
-                name="get_after_delete_response",
-                attachment_type=allure.attachment_type.TEXT,
-            )
-
-            if get_after_delete.status_code == 500:
-                allure.attach(
-                    get_after_delete.text,
-                    name="backend_bug_500_on_get",
-                    attachment_type=allure.attachment_type.TEXT,
-                )
-                pytest.xfail(
-                    "Known backend issue: GET by non-existing ID returns 500 instead of 404"
-                )
-            else:
-                assert get_after_delete.status_code in (404, 410), (
-                    f"Ожидали 404 или 410, получили {get_after_delete.status_code}"
-                )
-
-        # --- Повторное удаление ---
-        with allure.step("Повторное удаление той же сущности"):
-            second_delete = post_actions.delete_post(post.id)
-            allure.attach(
-                json.dumps(dict(second_delete.headers), indent=2),
-                name="second_delete_response_headers",
+                json.dumps(dict(get_response.headers), indent=2),
+                name="get_response_headers_after_delete",
                 attachment_type=allure.attachment_type.JSON,
             )
+            assert get_response.status_code == 404, (
+                f"Сущность не удалена, статус: {get_response.status_code}"
+            )
 
-            if second_delete.status_code == 500:
-                pytest.xfail(
-                    "Known backend issue: повторное удаление возвращает 500 вместо 204/404"
-                )
-            else:
-                # Если бекенд исправят, допускаем 204 или 404
-                assert second_delete.status_code in (204, 404), (
-                    f"Ожидали 204 или 404, получили {second_delete.status_code}"
-                )
+    @allure.story("Удаление несуществующей сущности")
+    @allure.severity(allure.severity_level.NORMAL)
+    @allure.tag("api", "negative", "delete", "v1.0")
+    @allure.testcase("TC-P8. Удаление несуществующего поста")
+    @allure.description_html("""
+    <b>Цель:</b> Проверить корректность обработки попытки удаления несуществующей сущности.
+    <b>Ожидаемый результат:</b>
+    - HTTP 404
+    - В теле ответа есть код ошибки, связанный с отсутствующей сущностью
+    """)
+    @pytest.mark.negative
+    def test_delete_nonexistent_post(self, post_actions: PostActions):
+        nonexistent_id = 99999999  # Предполагаемый несуществующий ID
+
+        with allure.step("Пытаемся удалить несуществующую сущность"):
+            delete_response = post_actions.delete_post_no_raise(nonexistent_id)
+            allure.attach(
+                json.dumps(dict(delete_response.headers), indent=2),
+                name="delete_response_headers_nonexistent",
+                attachment_type=allure.attachment_type.JSON,
+            )
+            assert delete_response.status_code == 404, (
+                f"Ожидался статус код 404, получен {delete_response.status_code}"
+            )
+            response_json = delete_response.json()
+            assert "rest_post_invalid_id" in response_json.get("code", "").lower(), (
+                "В сообщении об ошибке должен быть указан 'rest_post_invalid_id'"
+            )

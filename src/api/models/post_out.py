@@ -4,14 +4,14 @@ from pydantic import BaseModel, ConfigDict
 
 
 class Title(BaseModel):
-    raw: str
+    raw: str | None = None
     rendered: str
 
     model_config = ConfigDict(extra="ignore")
 
 
 class Content(BaseModel):
-    raw: str
+    raw: str | None = None
     rendered: str
     protected: bool
 
