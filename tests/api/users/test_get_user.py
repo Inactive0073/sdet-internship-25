@@ -3,6 +3,7 @@ import pytest
 
 from src.api.actions import UserActions
 from src.api.models import UserCreationResponse, UserPublicResponse
+from src.services.db.dao import UserDAO
 
 
 @allure.parent_suite("API WordPress")
@@ -23,7 +24,7 @@ class TestGetEntityById:
     
     <b>Ожидаемый результат:</b>
         - HTTP 200""")
-    def test_user_by_id(self, user: UserCreationResponse, user_actions: UserActions):
+    def test_user_by_id(self, user: UserCreationResponse, user_actions: UserActions, user_dao: UserDAO):
         fetched = user_actions.get_user_by_id(user.id)
 
         assert isinstance(fetched, UserPublicResponse), (
@@ -33,3 +34,7 @@ class TestGetEntityById:
             f"ID должен совпадать: ожидали {user.id}, получили {fetched.id}"
         )
         assert user.name == fetched.name, "Email должен совпадать"
+
+        assert user_dao.email_exists(user.email), (
+            "Пользователь не найден в БД"
+        )

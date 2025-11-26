@@ -14,6 +14,7 @@ class DBClient:
 
     def connect(self) -> MySQLConnection | PooledMySQLConnection:
         if self._connection is None:
+            print(f"Config {self.config}")
             self._connection = mysql.connector.connect(**self.config)
         return self._connection
 
