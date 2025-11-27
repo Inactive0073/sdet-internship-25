@@ -54,7 +54,7 @@ def user_actions(api_client):
     return UserActions(api_client)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def db():
     client = DBClient(db_config)
     yield client
