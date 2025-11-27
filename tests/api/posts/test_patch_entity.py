@@ -3,6 +3,7 @@ import pytest
 
 from src.api.actions.post_aciton import PostActions
 from src.api.models.post import PostCreationRequest, PostCreationResponse
+from src.services.db.dao import PostDAO
 
 
 @allure.parent_suite("API WordPress")
@@ -27,10 +28,18 @@ class TestPatchEntity:
     """)
     @allure.title("TC-P5. Частичное обновление сущности через PATCH")
     @pytest.mark.positive
-    def test_patch_entity(self, post: PostCreationResponse, post_actions: PostActions):
+    def test_patch_entity(
+        self, post: PostCreationResponse, post_actions: PostActions, post_dao: PostDAO
+    ):
         updated_request = PostCreationRequest.random()
-        response = post_actions.patch_post(post.id, updated_request)
+        with allure.step("Обновляем пост"):
+            response = post_actions.patch_post(post.id, updated_request)
 
+        post_in_db = post_dao.get_post(post.id)
+        assert post_in_db is not None, "Пост не найден в БД после обновления"
+        assert post_in_db["post_title"] == updated_request.title, (
+            "Title поста в БД не совпадает с обновлёнными данными"
+        )
         assert 200 <= int(response.status_code) <= 204, (
             f"Статус код не соответствует ожидаемому. Текущий статус код: {response.status_code}"
         )
@@ -51,12 +60,13 @@ class TestPatchEntity:
     @allure.title("TC-P6. Редактирование поста с некорректным типом данных")
     @pytest.mark.negative
     def test_patch_entity_with_invalid_data(
-        self, post: PostCreationResponse, post_actions: PostActions
+        self, post: PostCreationResponse, post_actions: PostActions, post_dao: PostDAO
     ):
         invalid_request = PostCreationRequest.random(
             status="123"
         )  # Некорректный тип данных для поля status
-
+        post_in_db = post_dao.get_post(post.id)
+        assert post_in_db is not None, "Пост не найден в БД перед обновлением"
         with allure.step("Пытаемся частично обновить пост с некорректными данными"):
             response = post_actions.patch_post_with_invalid_data(
                 post.id, invalid_request
@@ -68,4 +78,7 @@ class TestPatchEntity:
             response_json = response.json()
             assert "rest_invalid_param" in response_json.get("code", "").lower(), (
                 "В сообщении об ошибке должен быть указан 'invalid_data'"
+            )
+            assert post_in_db["post_status"] == post.status, (
+                "Статус поста в БД изменился после попытки обновления с некорректными данными"
             )

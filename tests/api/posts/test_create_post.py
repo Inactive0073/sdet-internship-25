@@ -6,6 +6,7 @@ import pytest
 from src.api.actions import PostActions
 from src.api.models import PostCreationRequest
 from src.api.models.post import PostCreationResponse
+from src.services.db.dao import PostDAO
 
 
 @allure.parent_suite("API WordPress")
@@ -30,7 +31,7 @@ class TestCreatePost:
     - Поля совпадают с данными запроса
     """)
     @pytest.mark.positive
-    def test_create_post(self, post_actions: PostActions):
+    def test_create_post(self, post_actions: PostActions, post_dao: PostDAO):
         request_data = PostCreationRequest.random()
 
         created = post_actions.create_post(request_data)
@@ -42,6 +43,16 @@ class TestCreatePost:
             "Title не совпадает с исходными данными"
         )
         assert created.status == request_data.status, "Флаг status должен совпадать"
+
+        post_in_db = post_dao.get_post(created.id)
+        assert post_in_db is not None, "Пост не найден в БД"
+
+        assert post_in_db["post_title"] == request_data.title, (
+            "Title поста в БД не совпадает с исходными данными"
+        )
+        assert post_in_db["post_content"] == request_data.content, (
+            "Content поста в БД не совпадает с исходными данными"
+        )
 
     @allure.story("Создание поста — валидация данных")
     @allure.title("TC-P2. Создание поста с пустыми полями title и content")
@@ -57,9 +68,12 @@ class TestCreatePost:
     - В теле ответа есть код ошибки, связанный с пустыми полями
     """)
     @pytest.mark.negative
-    def test_create_post_with_empty_fields(self, post_actions: PostActions):
+    def test_create_post_with_empty_fields(
+        self, post_actions: PostActions, post_dao: PostDAO
+    ):
         request_data = PostCreationRequest.random(empty=True)
 
+        count_post = post_dao.count_posts()
         with allure.step("Пытаемся создать пост с пустым title, content"):
             created = post_actions.create_post_with_empty_fields(request_data)
 
@@ -69,4 +83,8 @@ class TestCreatePost:
             response_json: dict[str, Any] = created.json()
             assert "empty_content" in response_json.get("code", "").lower(), (
                 "В сообщении об ошибке должен быть указан 'empty_content'"
+            )
+
+            assert post_dao.count_posts() == count_post, (
+                "Количество постов в БД изменилось после попытки создания с пустыми полями"
             )

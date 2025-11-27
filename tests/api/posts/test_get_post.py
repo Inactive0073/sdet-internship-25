@@ -3,6 +3,7 @@ import pytest
 
 from src.api.actions import PostActions
 from src.api.models.post import PostCreationResponse
+from src.services.db.dao import PostDAO
 
 
 @allure.parent_suite("API WordPress")
@@ -23,8 +24,12 @@ class TestGetEntityById:
     
     <b>Ожидаемый результат:</b>
         - HTTP 200""")
-    def test_post_by_id(self, post: PostCreationResponse, post_actions: PostActions):
+    def test_post_by_id(
+        self, post: PostCreationResponse, post_actions: PostActions, post_dao: PostDAO
+    ):
         fetched = post_actions.get_post_by_id(post.id)
+        post_in_db = post_dao.get_post(post.id)
+        assert post_in_db is not None, "Пост не найден в БД"
 
         assert isinstance(fetched, PostCreationResponse), (
             "Ответ не соответствует модели EntityResponse"
@@ -33,6 +38,12 @@ class TestGetEntityById:
             f"ID должен совпадать: ожидали {post.id}, получили {fetched.id}"
         )
         assert post.title.rendered == fetched.title.rendered, "Title должен совпадать"
+        assert post_in_db.get("post_title") == fetched.title.rendered, (
+            "Title поста в БД не совпадает с полученными данными"
+        )
+        assert post_in_db.get("post_content") == fetched.content.text, (
+            "Content поста в БД не совпадает с полученными данными"
+        )
 
     @allure.title("TC-P6: Получение несуществующего поста (негативный)")
     @allure.story("Получение поста по несуществующему ID")
@@ -49,7 +60,9 @@ class TestGetEntityById:
         """
     )
     @pytest.mark.negative
-    def test_get_post_by_nonexistent_id(self, post_actions: PostActions):
+    def test_get_post_by_nonexistent_id(
+        self, post_actions: PostActions, post_dao: PostDAO
+    ):
         nonexistent_id = 99999999  # Предполагается, что такого ID нет
 
         with allure.step(
@@ -61,7 +74,8 @@ class TestGetEntityById:
                 name="get_nonexistent_post_response",
                 attachment_type=allure.attachment_type.TEXT,
             )
-
+            post_in_db = post_dao.get_post(nonexistent_id)
+            assert post_in_db is None, "Пост с несуществующим ID найден в БД"
             assert response.status_code == 404, (
                 f"Ожидался статус код 404, получен {response.status_code}"
             )

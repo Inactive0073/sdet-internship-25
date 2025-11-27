@@ -24,7 +24,9 @@ class TestGetEntityById:
     
     <b>Ожидаемый результат:</b>
         - HTTP 200""")
-    def test_user_by_id(self, user: UserCreationResponse, user_actions: UserActions, user_dao: UserDAO):
+    def test_user_by_id(
+        self, user: UserCreationResponse, user_actions: UserActions, user_dao: UserDAO
+    ):
         fetched = user_actions.get_user_by_id(user.id)
 
         assert isinstance(fetched, UserPublicResponse), (
@@ -35,6 +37,4 @@ class TestGetEntityById:
         )
         assert user.name == fetched.name, "Email должен совпадать"
 
-        assert user_dao.email_exists(user.email), (
-            "Пользователь не найден в БД"
-        )
+        assert user_dao.email_exists(user.email), "Пользователь не найден в БД"

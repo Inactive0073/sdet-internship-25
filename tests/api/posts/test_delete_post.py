@@ -5,6 +5,7 @@ import pytest
 
 from src.api.actions.post_aciton import PostActions
 from src.api.models.post import PostCreationResponse
+from src.services.db.dao import PostDAO
 
 
 @allure.parent_suite("API WordPress")
@@ -26,7 +27,9 @@ class TestDeleteEntity:
     - HTTP 200 или 204
     - Повторный GET по `id` возвращает 404
     """)
-    def test_delete_post(self, post: PostCreationResponse, post_actions: PostActions):
+    def test_delete_post(
+        self, post: PostCreationResponse, post_actions: PostActions, post_dao: PostDAO
+    ):
         # --- Первичное удаление ---
         with allure.step("Удаляем созданную сущность"):
             delete_response = post_actions.delete_post(post.id)
@@ -38,7 +41,6 @@ class TestDeleteEntity:
             assert delete_response.status_code == 200, (
                 f"Удаление не подтверждено, статус: {delete_response.status_code}"
             )
-
         # --- Проверка удаления ---
         with allure.step("Проверяем, что сущность удалена"):
             get_response = post_actions.get_post_by_id_no_raise(post.id)
@@ -49,6 +51,10 @@ class TestDeleteEntity:
             )
             assert get_response.status_code == 404, (
                 f"Сущность не удалена, статус: {get_response.status_code}"
+            )
+            post_after = post_dao.get_post(post.id)
+            assert post_after is None, (
+                f"Пост не был удален из БД, пост с ID {post.id} всё ещё существует."
             )
 
     @allure.story("Удаление несуществующей сущности")
@@ -62,9 +68,11 @@ class TestDeleteEntity:
     - В теле ответа есть код ошибки, связанный с отсутствующей сущностью
     """)
     @pytest.mark.negative
-    def test_delete_nonexistent_post(self, post_actions: PostActions):
+    def test_delete_nonexistent_post(
+        self, post_actions: PostActions, post_dao: PostDAO
+    ):
         nonexistent_id = 99999999  # Предполагаемый несуществующий ID
-
+        post_dao.count_posts()
         with allure.step("Пытаемся удалить несуществующую сущность"):
             delete_response = post_actions.delete_post_no_raise(nonexistent_id)
             allure.attach(
@@ -74,6 +82,9 @@ class TestDeleteEntity:
             )
             assert delete_response.status_code == 404, (
                 f"Ожидался статус код 404, получен {delete_response.status_code}"
+            )
+            assert post_dao.get_post(nonexistent_id) is None, (
+                f"Пост с несуществующим ID {nonexistent_id} найден в БД"
             )
             response_json = delete_response.json()
             assert "rest_post_invalid_id" in response_json.get("code", "").lower(), (
