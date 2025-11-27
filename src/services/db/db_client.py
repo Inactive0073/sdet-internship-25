@@ -14,7 +14,6 @@ class DBClient:
 
     def connect(self) -> MySQLConnection | PooledMySQLConnection:
         if self._connection is None:
-            print(f"Config {self.config}")
             self._connection = mysql.connector.connect(**self.config)
         return self._connection
 
@@ -30,7 +29,9 @@ class DBClient:
         conn.commit()
         cursor.close()
 
-    def fetch_one(self, query: str, params: Optional[ParamsType] = None) -> Optional[Dict[str, Any]]:
+    def fetch_one(
+        self, query: str, params: Optional[ParamsType] = None
+    ) -> Optional[Dict[str, Any]]:
         conn = self.connect()
         cursor = conn.cursor(dictionary=True)
 
@@ -43,7 +44,9 @@ class DBClient:
         cursor.close()
         return row
 
-    def fetch_all(self, query: str, params: Optional[ParamsType] = None) -> Sequence[Dict[str, Any]]:
+    def fetch_all(
+        self, query: str, params: Optional[ParamsType] = None
+    ) -> Sequence[Dict[str, Any]]:
         conn = self.connect()
         cursor = conn.cursor(dictionary=True)
 

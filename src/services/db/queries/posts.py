@@ -36,3 +36,12 @@ SELECT post_status
 FROM wp_posts
 WHERE ID = %s;
 """
+
+COUNT_NON_TRASH_POSTS = """
+SELECT COUNT(*) AS cnt FROM wp_posts WHERE post_status != 'trash';
+"""
+
+GET_ALL_POSTS = """
+SELECT *
+FROM wp_posts;
+"""
