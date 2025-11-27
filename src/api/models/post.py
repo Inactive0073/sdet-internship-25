@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any
 
+from bs4 import BeautifulSoup
 from faker import Faker
 from pydantic import Field
 
@@ -18,6 +19,17 @@ class Content(Base):
     raw: str | None = None
     rendered: str
     protected: bool
+
+    @property
+    def text(self) -> str:
+        """
+        Возвращает чистый текст без HTML-тегов.
+        Если raw есть — используем её.
+        Если raw нет — очищаем rendered от HTML.
+        """
+        source = self.raw or self.rendered
+        soup = BeautifulSoup(source, "html.parser")
+        return soup.get_text().strip()
 
 
 class PostCreationRequest(Base):
