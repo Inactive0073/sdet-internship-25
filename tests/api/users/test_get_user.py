@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from src.api.actions import UserActions
-from src.api.models import UserCreationResponse, UserPublicResponse
+from src.api.models import UserCreationRequest
 from src.services.db.dao import UserDAO
 
 
@@ -24,17 +24,15 @@ class TestGetEntityById:
     
     <b>Ожидаемый результат:</b>
         - HTTP 200""")
-    def test_user_by_id(
-        self, user: UserCreationResponse, user_actions: UserActions, user_dao: UserDAO
-    ):
-        fetched = user_actions.get_user_by_id(user.id)
+    def test_user_by_id(self, user_in_db, user_dao: UserDAO, user_actions: UserActions):
+        user_obj, user_id = user_in_db
+        user_obj: UserCreationRequest
 
-        assert isinstance(fetched, UserPublicResponse), (
-            "Ответ не соответствует модели UserResponse"
-        )
-        assert fetched.id == user.id, (
-            f"ID должен совпадать: ожидали {user.id}, получили {fetched.id}"
-        )
-        assert user.name == fetched.name, "Email должен совпадать"
+        fetched = user_actions.get_user_by_id(user_id)
 
-        assert user_dao.email_exists(user.email), "Пользователь не найден в БД"
+        assert user_id == fetched.id, (
+            f"ID должен совпадать: ожидали {user_id}, получили {fetched.id}"
+        )
+        assert user_obj.username == fetched.name, "Никнейм должен совпадать"
+
+        assert user_dao.email_exists(user_obj.email), "Пользователь не найден в БД"

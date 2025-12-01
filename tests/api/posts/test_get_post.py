@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from src.api.actions import PostActions
-from src.api.models.post import PostCreationResponse
+from src.api.models.post import PostCreationResponse, PostCreationRequest
 from src.services.db.dao import PostDAO
 
 
@@ -24,20 +24,22 @@ class TestGetEntityById:
     
     <b>Ожидаемый результат:</b>
         - HTTP 200""")
-    def test_post_by_id(
-        self, post: PostCreationResponse, post_actions: PostActions, post_dao: PostDAO
-    ):
-        fetched = post_actions.get_post_by_id(post.id)
-        post_in_db = post_dao.get_post(post.id)
+    @pytest.mark.positive
+    def test_post_by_id(self, post_in_db, post_actions: PostActions, post_dao: PostDAO):
+        _, post_id = post_in_db
+
+        fetched = post_actions.get_post_by_id(post_id)
+
+        post_in_db = post_dao.get_post(post_id)
+
         assert post_in_db is not None, "Пост не найден в БД"
 
         assert isinstance(fetched, PostCreationResponse), (
             "Ответ не соответствует модели EntityResponse"
         )
-        assert fetched.id == post.id, (
-            f"ID должен совпадать: ожидали {post.id}, получили {fetched.id}"
+        assert fetched.id == post_id, (
+            f"ID должен совпадать: ожидали {post_id}, получили {fetched.id}"
         )
-        assert post.title.rendered == fetched.title.rendered, "Title должен совпадать"
         assert post_in_db.get("post_title") == fetched.title.rendered, (
             "Title поста в БД не совпадает с полученными данными"
         )
