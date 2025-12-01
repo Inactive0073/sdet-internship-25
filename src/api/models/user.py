@@ -19,9 +19,9 @@ class ExtraCapabilities(Base):
 
 
 class UserCreationRequest(Base):
-    username: Optional[str] = Field(..., description="Имя пользователя")
-    email: Optional[str] = Field(..., description="Email пользователя")
-    password: Optional[str] = Field(..., description="Пароль пользователя")
+    username: str = Field(..., description="Имя пользователя")
+    email: str = Field(..., description="Email пользователя")
+    password: str = Field(..., description="Пароль пользователя")
 
     @classmethod
     def random(cls) -> "UserCreationRequest":
