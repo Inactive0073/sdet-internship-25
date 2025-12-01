@@ -14,8 +14,8 @@ class DBClient:
 
     def connect(self) -> MySQLConnection | PooledMySQLConnection:
         if self._connection is None:
-            self._connection = mysql.connector.connect(**self.config)
-        return self._connection
+            self._connection = mysql.connector.connect(**self.config)  # type: ignore
+        return self._connection  # type: ignore
 
     def execute(self, query: str, params: Optional[ParamsType] = None) -> None:
         conn = self.connect()
@@ -28,6 +28,13 @@ class DBClient:
 
         conn.commit()
         cursor.close()
+
+    def execute_and_return_id(self, query: str, params: tuple):
+        conn = self.connect()
+        with conn.cursor() as cursor:
+            cursor.execute(query, params)
+            conn.commit()
+            return cursor.lastrowid
 
     def fetch_one(
         self, query: str, params: Optional[ParamsType] = None
