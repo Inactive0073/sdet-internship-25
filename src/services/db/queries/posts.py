@@ -45,3 +45,35 @@ GET_ALL_POSTS = """
 SELECT *
 FROM wp_posts;
 """
+
+CREATE_POST_DB = """
+INSERT INTO wp_posts (
+    post_author,
+    post_date,
+    post_date_gmt,
+    post_content,
+    post_title,
+    post_status,
+    post_name,
+    post_modified,
+    post_modified_gmt,
+    post_type,
+    post_excerpt,
+    to_ping,
+    pinged,
+    post_content_filtered
+)
+VALUES (
+    %s, NOW(), NOW(),
+    %s,
+    %s,
+    %s,
+    %s,
+    NOW(), NOW(),
+    'post',
+    '',
+    '',
+    '',
+    ''
+);
+"""
