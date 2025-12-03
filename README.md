@@ -44,3 +44,8 @@
  19. Активировать плагин JSON Basic Authentification
  20. Открыть Postman и посмотреть информацию о пользователе (использовать базовую аутентификацию)
  21. Если все шаги выполнены верно, то в запросе отобразится информация о текущем пользователе
+
+
+## Документация
+- [Тест-кейсы API WordPress](https://docs.google.com/document/d/1rkns-JzGErwzyAuMZ5dT19Xzx8wNEO2vOPxT-1pIMdE/edit?usp=sharing)
+- [REST API WordPress](https://developer.wordpress.org/rest-api/reference/)
