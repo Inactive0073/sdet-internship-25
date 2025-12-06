@@ -49,3 +49,11 @@
 ## Документация
 - [Тест-кейсы API WordPress](https://docs.google.com/document/d/1rkns-JzGErwzyAuMZ5dT19Xzx8wNEO2vOPxT-1pIMdE/edit?usp=sharing)
 - [REST API WordPress](https://developer.wordpress.org/rest-api/reference/)
+
+
+## Запуск тестов
+Все маркировки тестов находятся в pytest.ini
+Для запуска тестов по определенному сервису необходимо выполнить команду:
+```bash
+pytest -m yandex_disk
+```
