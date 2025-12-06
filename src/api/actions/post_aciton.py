@@ -2,8 +2,8 @@ import allure
 import requests
 
 from src.api.client import APIClient
-from src.api.models import PostCreationRequest
-from src.api.models.post import PostCreationResponse
+from src.api.models.wordpress import PostCreationRequest
+from src.api.models.wordpress.post import PostCreationResponse
 from src.data import Endpoints
 
 
