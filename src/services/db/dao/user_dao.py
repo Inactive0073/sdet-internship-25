@@ -1,12 +1,12 @@
+from src.api.models.wordpress import UserCreationRequest
 from src.services.db.base_dao import BaseDAO
-from src.api.models import UserCreationRequest
 from src.services.db.queries.users import (
-    GET_USER_BY_ID,
     CHECK_USER_BY_EMAIL,
-    DELETE_USER_BY_ID,
     CREATE_USER,
     CREATE_USER_META_CAP,
     CREATE_USER_META_LEVEL,
+    DELETE_USER_BY_ID,
+    GET_USER_BY_ID,
 )
 
 

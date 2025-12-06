@@ -1,8 +1,8 @@
 from typing import Any, Dict, Optional, Sequence, Union
+
 import mysql.connector
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.pooling import PooledMySQLConnection
-
 
 ParamsType = Union[Sequence[Any], Dict[str, Any]]
 
