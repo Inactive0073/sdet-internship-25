@@ -15,7 +15,7 @@ from src.api.models.yandex_disk import YandexDiskInfoErrorResponse
 @allure.label("owner", "Alexey Yumanov")
 @pytest.mark.api
 @pytest.mark.yandex_disk
-class TestYandexDiskAuthValid:
+class TestYandexDiskAuthInvalid:
     @allure.story("Проверка аутентификации с невалидным токеном")
     @allure.title("TC-D2. Получение информации о диске с невалидным токеном")
     @allure.testcase("Проверка аутентификации Яндекс Диск с невалидным токеном")
@@ -30,7 +30,7 @@ class TestYandexDiskAuthValid:
     - Поля объекта содержат ожидаемые значения
     """)
     @pytest.mark.negative
-    def test_get_disk_info_with_valid_token(
+    def test_get_disk_info_with_invalid_token(
         self,
         yandex_disk_actions_no_auth: DiskActions,
     ):
