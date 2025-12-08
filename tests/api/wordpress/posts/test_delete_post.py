@@ -4,7 +4,7 @@ import allure
 import pytest
 
 from src.api.actions.post_aciton import PostActions
-from src.api.models.post import PostCreationResponse
+from src.api.models.wordpress.post import PostCreationResponse
 from src.services.db.dao import PostDAO
 
 
@@ -15,6 +15,7 @@ from src.services.db.dao import PostDAO
 @allure.feature("Post Deletion")
 @allure.label("owner", "Alexey Yumanov")
 @pytest.mark.api
+@pytest.mark.wordpress
 class TestDeleteEntity:
     @allure.story("Удаление сущности по ID")
     @allure.severity(allure.severity_level.CRITICAL)

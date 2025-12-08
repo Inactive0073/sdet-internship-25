@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from src.api.actions.post_aciton import PostActions
-from src.api.models.post import PostCreationRequest, PostCreationResponse
+from src.api.models.wordpress.post import PostCreationRequest, PostCreationResponse
 from src.services.db.dao import PostDAO
 
 
@@ -13,6 +13,7 @@ from src.services.db.dao import PostDAO
 @allure.feature("Post Patch")
 @allure.label("owner", "Alexey Yumanov")
 @pytest.mark.api
+@pytest.mark.wordpress
 class TestPatchEntity:
     @allure.story("Частичное обновление сущности")
     @allure.severity(allure.severity_level.NORMAL)

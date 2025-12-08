@@ -4,8 +4,8 @@ import allure
 import pytest
 
 from src.api.actions import PostActions
-from src.api.models import PostCreationRequest
-from src.api.models.post import PostCreationResponse
+from src.api.models.wordpress import PostCreationRequest
+from src.api.models.wordpress.post import PostCreationResponse
 from src.services.db.dao import PostDAO
 
 
@@ -16,6 +16,7 @@ from src.services.db.dao import PostDAO
 @allure.feature("Post Creation")
 @allure.label("owner", "Alexey Yumanov")
 @pytest.mark.api
+@pytest.mark.wordpress
 class TestCreatePost:
     @allure.story("Создание нового поста")
     @allure.title("TC-P1. Создание поста через API с валидными данными")

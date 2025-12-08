@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from src.api.actions import UserActions
-from src.api.models import UserCreationRequest
+from src.api.models.wordpress import UserCreationRequest
 from src.services.db.dao import UserDAO
 
 
@@ -13,6 +13,7 @@ from src.services.db.dao import UserDAO
 @allure.feature("Get User by ID")
 @allure.label("owner", "Alexey Yumanov")
 @pytest.mark.api
+@pytest.mark.wordpress
 class TestGetEntityById:
     @allure.title("TC-P3: Получение существующего юзера (позитивный)")
     @allure.story("Получение юзера по ID")

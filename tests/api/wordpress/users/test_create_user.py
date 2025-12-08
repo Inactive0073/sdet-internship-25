@@ -2,8 +2,8 @@ import allure
 import pytest
 
 from src.api.actions import UserActions
-from src.api.models import UserCreationRequest
-from src.api.models.user import UserCreationResponse
+from src.api.models.wordpress import UserCreationRequest
+from src.api.models.wordpress.user import UserCreationResponse
 from src.services.db.dao import UserDAO
 
 
@@ -14,6 +14,7 @@ from src.services.db.dao import UserDAO
 @allure.feature("User Creation")
 @allure.label("owner", "Alexey Yumanov")
 @pytest.mark.api
+@pytest.mark.wordpress
 class TestCreatePost:
     @allure.story("Создание нового юзера")
     @allure.title("TC-U1. Создание юзера через API с валидными данными")

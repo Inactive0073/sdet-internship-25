@@ -1,13 +1,13 @@
+from src.api.models.wordpress import PostCreationRequest
 from src.services.db.base_dao import BaseDAO
-from src.api.models import PostCreationRequest
 from src.services.db.queries.posts import (
-    GET_POST_BY_ID,
     CHECK_POST_EXISTS,
-    DELETE_POST_BY_ID,
-    GET_POST_STATUS,
     COUNT_NON_TRASH_POSTS,
-    GET_ALL_POSTS,
     CREATE_POST_DB,
+    DELETE_POST_BY_ID,
+    GET_ALL_POSTS,
+    GET_POST_BY_ID,
+    GET_POST_STATUS,
 )
 
 

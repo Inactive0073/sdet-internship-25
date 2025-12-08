@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from src.api.actions import PostActions
-from src.api.models.post import PostCreationResponse, PostCreationRequest
+from src.api.models.wordpress.post import PostCreationRequest, PostCreationResponse
 from src.services.db.dao import PostDAO
 
 
@@ -13,6 +13,7 @@ from src.services.db.dao import PostDAO
 @allure.feature("Get Post by ID")
 @allure.label("owner", "Alexey Yumanov")
 @pytest.mark.api
+@pytest.mark.wordpress
 class TestGetEntityById:
     @allure.title("TC-P3: Получение существующего поста (позитивный)")
     @allure.story("Получение поста по ID")

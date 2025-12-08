@@ -1,7 +1,11 @@
 import allure
 
 from src.api.client import APIClient
-from src.api.models import UserCreationRequest, UserCreationResponse, UserPublicResponse
+from src.api.models.wordpress import (
+    UserCreationRequest,
+    UserCreationResponse,
+    UserPublicResponse,
+)
 from src.data import Endpoints
 
 

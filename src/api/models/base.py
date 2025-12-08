@@ -1,9 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 
-class BaseAPIModel(BaseModel):
+class BaseCommonModel(BaseModel):
     model_config = ConfigDict(
-        extra="ignore",
-        populate_by_name=True,
-        from_attributes=True,
+        extra="ignore", populate_by_name=True, from_attributes=True
     )

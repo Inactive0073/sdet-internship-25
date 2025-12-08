@@ -3,7 +3,7 @@ from typing import Optional
 import allure
 import requests
 
-from src.data.endpoints import Endpoints
+from src.data.wp_endpoints import Endpoints
 
 
 class APIClient:
@@ -28,3 +28,7 @@ class APIClient:
     @allure.step("DELETE запрос: {endpoint}")
     def delete(self, endpoint: str, **kwargs):
         return self.session.delete(f"{self.base_url}{endpoint}", **kwargs)
+
+    @allure.step("PUT запрос: {endpoint}")
+    def put(self, endpoint: str, **kwargs):
+        return self.session.put(f"{self.base_url}{endpoint}", **kwargs)
