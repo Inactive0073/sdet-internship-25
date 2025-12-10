@@ -9,6 +9,7 @@ from src.api.actions import DiskActions, PostActions, UserActions
 from src.api.client import APIClient
 from src.api.models.wordpress import PostCreationRequest, UserCreationRequest
 from src.data.db_config import db_config
+from src.data.data_generator import generate_random_folder_name
 from src.data.yandex_endpoints import YandexEndpoints
 from src.services.db.dao import PostDAO, UserDAO
 from src.services.db.db_client import DBClient
@@ -132,3 +133,18 @@ def yandex_disk_info(
     with allure.step("Получение информации о диске пользователя"):
         response = yandex_disk_actions.get_disk_info()
         yield response
+
+
+@pytest.fixture(scope="function")
+def yandex_created_folder_response(
+    yandex_disk_actions: DiskActions,
+) -> Generator[tuple[str, Response], None, None]:
+    """Создаёт тестовую папку перед каждым тестом и удаляет после."""
+    folder_name = generate_random_folder_name()
+    with allure.step(f"Создание папки '{folder_name}' на Яндекс Диске"):
+        response = yandex_disk_actions.create_folder(folder_path=f"disk:/{folder_name}")
+        yield folder_name, response
+        with allure.step(f"Удаление папки '{folder_name}' с Яндекс Диска"):
+            yandex_disk_actions.delete_folder(
+                folder_path=f"disk:/{folder_name}", permanently="true"
+            )
