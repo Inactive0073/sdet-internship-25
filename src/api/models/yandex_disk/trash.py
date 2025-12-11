@@ -1,9 +1,12 @@
+from pydantic import Field
+
 from .base import YandexDiskBaseModel
 
 
 class TrashItem(YandexDiskBaseModel):
     path: str
     type: str
+    origin_path: str = Field(alias="origin_path")
     name: str
 
 
@@ -22,4 +25,4 @@ class YandexTrashItemsResponse(YandexDiskBaseModel):
     name: str
     created: str
     modified: str
-    _embedded: TrashEmbedded
+    embedded_content: TrashEmbedded = Field(alias="_embedded")
