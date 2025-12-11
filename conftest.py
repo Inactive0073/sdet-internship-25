@@ -8,8 +8,8 @@ from requests import Response
 from src.api.actions import DiskActions, PostActions, UserActions
 from src.api.client import APIClient
 from src.api.models.wordpress import PostCreationRequest, UserCreationRequest
-from src.data.db_config import db_config
 from src.data.data_generator import generate_random_folder_name
+from src.data.db_config import db_config
 from src.data.yandex_endpoints import YandexEndpoints
 from src.services.db.dao import PostDAO, UserDAO
 from src.services.db.db_client import DBClient
@@ -136,15 +136,36 @@ def yandex_disk_info(
 
 
 @pytest.fixture(scope="function")
-def yandex_created_folder_response(
-    yandex_disk_actions: DiskActions,
+def unique_folder_name():
+    """Генерирует уникальное имя папки для каждого теста"""
+    folder_name = f"disk:/{generate_random_folder_name()}"
+    return folder_name
+
+
+@pytest.fixture(scope="function")
+def temp_created_folder(
+    yandex_disk_actions: DiskActions, unique_folder_name: str
 ) -> Generator[tuple[str, Response], None, None]:
     """Создаёт тестовую папку перед каждым тестом и удаляет после."""
-    folder_name = generate_random_folder_name()
-    with allure.step(f"Создание папки '{folder_name}' на Яндекс Диске"):
-        response = yandex_disk_actions.create_folder(folder_path=f"disk:/{folder_name}")
-        yield folder_name, response
-        with allure.step(f"Удаление папки '{folder_name}' с Яндекс Диска"):
-            yandex_disk_actions.delete_folder(
-                folder_path=f"disk:/{folder_name}", permanently="true"
+    with allure.step(f"Создание папки '{unique_folder_name}' на Яндекс Диске"):
+        response = yandex_disk_actions.create_folder(folder_path=unique_folder_name)
+        if response.status_code != 201:
+            pytest.fail(
+                f"Ошибка создания папки в фикстуре! Ожидался 201, получен {response.status_code}. "
+                f"Ответ: {response.text}"
             )
+        yield unique_folder_name, response
+        with allure.step(f"Удаление папки '{unique_folder_name}' с Яндекс Диска"):
+            yandex_disk_actions.delete_file_or_folder(
+                file_or_folder_path=unique_folder_name, permanently="true"
+            )
+
+
+@pytest.fixture(scope="function")
+def created_folder(
+    yandex_disk_actions: DiskActions, unique_folder_name: str
+) -> tuple[str, Response]:
+    """Создаёт тестовую папку перед каждым тестом, но не удаляет ее."""
+    with allure.step(f"Создание папки '{unique_folder_name}' на Яндекс Диске"):
+        response = yandex_disk_actions.create_folder(folder_path=unique_folder_name)
+        return unique_folder_name, response
