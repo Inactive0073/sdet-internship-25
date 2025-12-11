@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from src.api.actions import PostActions
-from src.api.models.wordpress.post import PostCreationRequest, PostCreationResponse
+from src.api.models.wordpress.post import PostCreationResponse
 from src.services.db.dao import PostDAO
 
 
