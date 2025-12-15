@@ -11,16 +11,29 @@ from src.api.models.yandex_disk.data_classes import (
 from src.utils import compare_texts
 
 
-@allure.epic("Cloud API")
-@allure.feature("Yandex Disk Management")
-@allure.story("Создание и получение ресурсов (Папки)")
-@allure.suite("Folders CRUD Operations")
-@allure.sub_suite("PUT /v1/disk/resources")
+@allure.epic("API Yandex Disk")
+@allure.feature("Item Management")
+@allure.suite("Yandex Disk API Tests")
 @allure.label("owner", "Alexey Yumanov")
+@allure.link(
+    "https://yandex.ru/dev/disk/poligon",
+    name="Yandex Disk API Documentation",
+)
 @pytest.mark.api
 @pytest.mark.yandex_disk
-@pytest.mark.test
 class TestDiskItemManager:
+    @allure.story("Upload and Copy File")
+    @allure.sub_suite("POST /resources/upload | POST /resources/copy")
+    @allure.title("Загрузка файла в папку и копирование в другую директорию")
+    @allure.description(
+        """
+        Проверка сценария:
+        1. Создание входной и выходной директорий
+        2. Загрузка текстового файла в input_data
+        3. Копирование файла в output_data
+        4. Повторное копирование и проверка ошибки 409 CONFLICT
+        """
+    )
     def test_upload_and_copy(
         self,
         yandex_disk_actions: DiskActions,
@@ -33,19 +46,19 @@ class TestDiskItemManager:
         output_folder = f"{unique_folder_name}/output_data"
         disk_path_input = f"{input_folder}/data.txt"
         disk_path_output = f"{output_folder}/data.txt"
+        with allure.step("Создаём директории input_data и output_data"):
+            created_folder_response = yandex_disk_actions.create_folder(input_folder)
+            assert created_folder_response.status_code == 201, (
+                f"Ожидался код статуса 201, получен {created_folder_response.status_code}"
+            )
 
-        created_folder_response = yandex_disk_actions.create_folder(input_folder)
-        assert created_folder_response.status_code == 201, (
-            f"Ожидался код статуса 201, получен {created_folder_response.status_code}"
-        )
-
-        created_folder_response = yandex_disk_actions.create_folder(output_folder)
-        assert created_folder_response.status_code == 201, (
-            f"Ожидался код статуса 201, получен {created_folder_response.status_code}"
-        )
-
-        link_obj = LinkDataClass.from_dict(created_folder_response.json())
-        assert link_obj.href, "Ссылка для загрузки файла пустая"
+            created_folder_response = yandex_disk_actions.create_folder(output_folder)
+            assert created_folder_response.status_code == 201, (
+                f"Ожидался код статуса 201, получен {created_folder_response.status_code}"
+            )
+        with allure.step("Получаем ссылку для загрузки файла"):
+            link_obj = LinkDataClass.from_dict(created_folder_response.json())
+            assert link_obj.href, "Ссылка для загрузки файла пустая"
 
         with allure.step("Загружауем файл в папку input_data"):
             upload_link_resp = yandex_disk_actions.get_upload_link(disk_path_input)
@@ -99,6 +112,18 @@ class TestDiskItemManager:
                 f"Ожидалось, что значение не пустое: {err_response.message}"
             )
 
+    @allure.story("Download File")
+    @allure.sub_suite("GET /resources/download")
+    @allure.title("Скачивание текстового файла и проверка содержимого")
+    @allure.description(
+        """
+        Проверка сценария:
+        1. Создание директории sdet_data
+        2. Загрузка текстового файла
+        3. Получение ссылки для скачивания
+        4. Скачивание файла и сравнение содержимого
+        """
+    )
     @pytest.mark.positive
     def test_download_file(
         self,

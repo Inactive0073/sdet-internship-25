@@ -11,6 +11,10 @@ from src.api.models.yandex_disk import YandexDiskInfoResponse
 @allure.epic("API Yandex Disk")
 @allure.feature("Authentication Validation")
 @allure.label("owner", "Alexey Yumanov")
+@allure.link(
+    "https://yandex.ru/dev/disk/poligon",
+    name="Yandex Disk API Documentation",
+)
 @pytest.mark.api
 @pytest.mark.yandex_disk
 class TestYandexDiskAuthValid:

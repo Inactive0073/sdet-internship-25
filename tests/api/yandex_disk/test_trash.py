@@ -7,10 +7,14 @@ from src.api.models.yandex_disk import LinkResponse, ResourceItem
 from src.api.models.yandex_disk.trash import YandexTrashItemsResponse
 
 
-@allure.epic("API Services")
-@allure.feature("Yandex Disk")
+@allure.epic("API Yandex Disk")
+@allure.feature("Trash Management")
 @allure.story("Управление Корзиной")
 @allure.suite("Trash API Tests")
+@allure.link(
+    "https://yandex.ru/dev/disk/poligon",
+    name="Yandex Disk API Documentation",
+)
 @allure.label("owner", "Alexey Yumanov")
 @pytest.mark.api
 @pytest.mark.yandex_disk
