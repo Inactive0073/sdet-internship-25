@@ -63,9 +63,28 @@ class DiskActions:
         return self.client.get(YandexEndpoints.UPLOAD, params=params)
 
     @allure.step("Загрузка файла на Яндекс Диск по ссылке {upload_url}")
-    def upload_file(self, upload_url: str, file_data: bytes) -> Response:
-        headers = {"Content-Type": "application/octet-stream"}
-        return self.client.post(upload_url, data=file_data, headers=headers)
+    def upload_file(self, upload_url: str, file_data) -> Response:
+        return self.client.put(upload_url, data=file_data)
+
+    @allure.step("Получение ссылки для скачивания с Яндекс диска по пути {file_path}")
+    def get_download_url(self, file_path: str):
+        params = {"path": file_path}
+        return self.client.get(YandexEndpoints.DOWNLOAD, params=params)
+
+    @allure.step("Скачиваем файл по ссылке {url}")
+    def download_file_by_url(self, url: str):
+        return self.client.get(url)
+
+    @allure.step("Создание копии файла или папки из {_from} в {to}")
+    def copy_resource(
+        self, _from: str, to: str, overwrite: Literal["true", "false"] = "false"
+    ):
+        params = {"from": _from, "path": to, "overwrite": overwrite}
+        return self.client.post(YandexEndpoints.COPY, params=params)
+
+    @allure.step("Получение списка файлов пользователя")
+    def get_files_list(self) -> Response:
+        return self.client.get(YandexEndpoints.FILES_LIST)
 
     @allure.step("Проверка наличия файла/папки в корзине по {original_path}")
     def is_resource_in_trash(self, original_path: str) -> bool:

@@ -6,11 +6,15 @@ from src.api.actions import DiskActions
 from src.api.models.yandex_disk import LinkResponse, YandexDiskInfoErrorResponse
 
 
-@allure.epic("Cloud API")
-@allure.feature("Yandex Disk Management")
+@allure.epic("API Yandex Disk")
+@allure.feature("Folders Management")
 @allure.story("Создание и получение ресурсов (Папки)")
 @allure.suite("Folders CRUD Operations")
 @allure.sub_suite("PUT /v1/disk/resources")
+@allure.link(
+    "https://yandex.ru/dev/disk/poligon",
+    name="Yandex Disk API Documentation",
+)
 @allure.label("owner", "Alexey Yumanov")
 @pytest.mark.api
 @pytest.mark.yandex_disk
