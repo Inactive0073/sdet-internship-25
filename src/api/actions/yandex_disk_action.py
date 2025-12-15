@@ -82,6 +82,10 @@ class DiskActions:
         params = {"from": _from, "path": to, "overwrite": overwrite}
         return self.client.post(YandexEndpoints.COPY, params=params)
 
+    @allure.step("Получение списка файлов пользователя")
+    def get_files_list(self) -> Response:
+        return self.client.get(YandexEndpoints.FILES_LIST)
+
     @allure.step("Проверка наличия файла/папки в корзине по {original_path}")
     def is_resource_in_trash(self, original_path: str) -> bool:
         response = self.get_trash_items()
