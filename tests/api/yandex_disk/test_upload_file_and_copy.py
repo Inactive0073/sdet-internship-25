@@ -2,12 +2,11 @@ import allure
 import pytest
 from requests import Response
 
-
 from src.api.actions import DiskActions
 from src.api.models.yandex_disk.data_classes import (
+    ErrorDataClass,
     LinkDataClass,
     ResourceDataClass,
-    ErrorDataClass,
 )
 from src.utils import compare_texts
 
@@ -119,7 +118,9 @@ class TestDiskItemManager:
         assert link_obj.href, "Ссылка для загрузки файла пустая"
 
         with allure.step("Загружауем файл в папку {sdet_folder}"):
-            upload_link_resp = yandex_disk_actions.get_upload_link(f"{sdet_folder}/data.txt")
+            upload_link_resp = yandex_disk_actions.get_upload_link(
+                f"{sdet_folder}/data.txt"
+            )
             with open(local_file, "rb") as f:
                 upload_response = yandex_disk_actions.upload_file(
                     LinkDataClass.from_dict(upload_link_resp.json()).href, f
