@@ -169,3 +169,12 @@ def created_folder(
     with allure.step(f"Создание папки '{unique_folder_name}' на Яндекс Диске"):
         response = yandex_disk_actions.create_folder(folder_path=unique_folder_name)
         return unique_folder_name, response
+
+
+@pytest.fixture(scope="function")
+def local_file(tmp_path) -> str:
+    """Возвращает путь к файлу с данными"""
+    file_content = f"username={Config.USERNAME}\npassword={Config.PASSWORD}"
+    file_path = tmp_path / "data.txt"
+    file_path.write_text(file_content, encoding="utf-8")
+    return str(file_path)
