@@ -2,9 +2,7 @@ import io
 import zipfile
 
 
-def extract_file_from_zip(
-    zip_bytes: bytes, file_name: str
-) -> bytes:
+def extract_file_from_zip(zip_bytes: bytes, file_name: str) -> bytes:
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zip_file:
         with zip_file.open(file_name) as extracted:
             return extracted.read()
